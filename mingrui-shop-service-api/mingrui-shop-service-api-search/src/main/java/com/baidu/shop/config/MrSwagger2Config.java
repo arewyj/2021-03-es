@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 /**
  * @ClassName MrSwagger2Config
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/3/4
  * @Version V1.0
  **/
@@ -40,7 +40,7 @@ public class MrSwagger2Config {
                 //条款地址
                 .termsOfServiceUrl("http://www.baidu.com")
                 //联系方式-->有String参数的地方但是已经过时,所以不推荐使用
-                .contact(new Contact("hexiangshen","baidu.com","hexiangshenn@163.com"))
+                .contact(new Contact("wyj","baidu.com","wangyanjun_Jay@163.com"))
                 //版本
                 .version("v1.0")
                 //项目描述

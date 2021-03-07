@@ -13,7 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 /**
  * @ClassName MrSwagger2Config
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/19
  * @Version V1.0
  **/
@@ -33,7 +33,7 @@ public class MrSwagger2Config {
         return new ApiInfoBuilder()
                 .title("明瑞SWAGGER2标题")
                 .termsOfServiceUrl("http://www.baidu.com")
-                .contact(new Contact("shenyaqi","baidu.com","shenyaqiii@163.com"))
+                .contact(new Contact("wyj","baidu.com","wangyanjun_Jay@163.com"))
                 .version("v1.0")
                 .description("描述")
                 .build();

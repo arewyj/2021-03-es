@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * @ClassName SpuEntity
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/2/1
  * @Version V1.0
  **/

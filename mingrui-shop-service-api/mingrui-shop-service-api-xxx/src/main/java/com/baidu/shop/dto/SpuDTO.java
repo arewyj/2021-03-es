@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @ClassName SpuDTO
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/2/1
  * @Version V1.0
  **/

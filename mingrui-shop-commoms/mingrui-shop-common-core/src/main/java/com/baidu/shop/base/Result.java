@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 /**
  * @ClassName Result
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/19
  * @Version V1.0
  **/

@@ -1,8 +1,10 @@
 server:
   port: 8300
 spring:
+  jackson:
+    default-property-inclusion: non_null #空值不返回
   elasticsearch:
     rest:
-      uris: 81.70.218.5:9200
+      uris: 81.70.218.233:9200
   application:
     name: search-server

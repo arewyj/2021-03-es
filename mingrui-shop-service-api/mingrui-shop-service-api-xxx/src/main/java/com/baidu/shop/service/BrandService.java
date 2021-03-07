@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * @ClassName BrandService
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/22
  * @Version V1.0
  **/
@@ -44,4 +44,7 @@ public interface BrandService {
     @GetMapping(value = "brand/getBrandInfoByCategoryId")
     Result<List<BrandEntity>> getBrandInfoByCategoryId(Integer cid);
 
+    @ApiOperation(value = "通过品牌id集合获取品牌")
+    @GetMapping(value = "brand/getBrandByIdList")
+    Result<List<BrandEntity>> getBrandByIdList(@RequestParam String ids);
 }

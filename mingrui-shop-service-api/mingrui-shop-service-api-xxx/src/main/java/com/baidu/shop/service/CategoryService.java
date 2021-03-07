@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @ClassName CategoryService
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/19
  * @Version V1.0
  **/
@@ -33,4 +33,8 @@ public interface CategoryService {
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "category/del")
     Result<JsonObject>deleteById(Integer id);
+
+    @ApiOperation(value = "通过id集合查询商品分类信息")
+    @GetMapping(value = "category/getCategoryByIdList")
+    Result<List<CategoryEntity>> getCategoryByIdList(@RequestParam String ids);
 }

@@ -6,7 +6,7 @@ import tk.mybatis.mapper.common.Mapper;
 /**
  * @ClassName SpecGroupMapper
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/26
  * @Version V1.0
  **/

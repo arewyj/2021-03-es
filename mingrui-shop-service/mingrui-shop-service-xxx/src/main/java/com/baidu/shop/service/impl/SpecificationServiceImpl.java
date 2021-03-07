@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * @ClassName SpecificationServiceImpl
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/26
  * @Version V1.0
  **/

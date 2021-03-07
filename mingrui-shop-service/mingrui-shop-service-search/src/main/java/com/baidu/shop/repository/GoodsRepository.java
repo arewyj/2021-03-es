@@ -6,7 +6,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 /**
  * @ClassName GoodsRepository
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/3/5
  * @Version V1.0
  **/

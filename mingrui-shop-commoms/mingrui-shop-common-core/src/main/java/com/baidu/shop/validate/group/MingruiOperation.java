@@ -3,7 +3,7 @@ package com.baidu.shop.validate.group;
 /**
  * @ClassName MingruiOperation
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/22
  * @Version V1.0
  **/

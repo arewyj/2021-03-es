@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @ClassName SkuMapper
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/2/3
  * @Version V1.0
  **/

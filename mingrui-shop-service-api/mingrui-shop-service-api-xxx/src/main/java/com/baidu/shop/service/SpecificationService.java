@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * @ClassName SpecificationService
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/26
  * @Version V1.0
  **/

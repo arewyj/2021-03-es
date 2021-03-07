@@ -11,7 +11,7 @@ spring:
     # 数据库连接用户
     username: root
     # 数据库连接密码
-    password: 123
+    password: root
     # 驱动名称
     driver-class-name: com.mysql.jdbc.Driver
     # boot2.0+使用hikari作为默认数据库连接池

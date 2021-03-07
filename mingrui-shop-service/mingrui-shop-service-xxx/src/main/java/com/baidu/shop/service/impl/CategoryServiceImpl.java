@@ -1,22 +1,28 @@
 package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
-import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.CategoryEntity;
+import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.service.CategoryService;
+import com.baidu.shop.status.HTTPStatus;
+import com.baidu.shop.utils.ObjectUtil;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.beans.Transient;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName CategoryServiceImpl
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/19
  * @Version V1.0
  **/
@@ -77,5 +83,13 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
         categoryMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<List<CategoryEntity>> getCategoryByIdList(String ids) {
+        List<Integer> idList = Arrays.asList(ids.split(",")).stream().map(idStr -> Integer.valueOf(idStr)).collect(Collectors.toList());
+        List<CategoryEntity> categoryEntities  = categoryMapper.selectByIdList(idList);
+
+        return this.setResultSuccess(categoryEntities);
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.beans.BeanUtils;
 /**
  * @ClassName BaiduBeanUtil
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/22
  * @Version V1.0
  **/

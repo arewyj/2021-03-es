@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * @ClassName BrandServiceImpl
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/22
  * @Version V1.0
  **/
@@ -41,6 +41,16 @@ public class BrandServiceImpl extends BaseApiService implements BrandService{
 
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
+
+    @Override
+    public Result<List<BrandEntity>> getBrandByIdList(String ids) {
+        List<Integer> idList = Arrays.asList(ids.split(",")).stream().map(idStr -> Integer.valueOf(idStr)).collect(Collectors.toList());
+
+        List<BrandEntity> brandEntities = brandMapper.selectByIdList(idList);
+
+        return this.setResultSuccess(brandEntities);
+    }
+
 
     @Override
     public Result<List<BrandEntity>> getBrandInfoByCategoryId(Integer cid) {

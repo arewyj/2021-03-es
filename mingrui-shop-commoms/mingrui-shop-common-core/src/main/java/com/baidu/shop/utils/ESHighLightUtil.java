@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * @ClassName ESHighLightUtil
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/3/4
  * @Version V1.0
  **/

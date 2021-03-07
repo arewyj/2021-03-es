@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 /**
  * @ClassName SpecParamDTO
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/28
  * @Version V1.0
  **/

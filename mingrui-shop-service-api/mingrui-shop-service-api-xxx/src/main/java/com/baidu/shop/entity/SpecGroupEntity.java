@@ -8,7 +8,7 @@ import javax.persistence.Table;
 /**
  * @ClassName SpecGroupEntity
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/26
  * @Version V1.0
  **/

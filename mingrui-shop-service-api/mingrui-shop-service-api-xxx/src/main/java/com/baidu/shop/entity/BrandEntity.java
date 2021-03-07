@@ -10,7 +10,7 @@ import javax.persistence.Table;
 /**
  * @ClassName BrandEntity
  * @Description: TODO
- * @Author hexiangshen
+ * @Author wyj
  * @Date 2021/1/22
  * @Version V1.0
  **/
