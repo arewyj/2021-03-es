@@ -16,6 +16,8 @@
     <modules>
         <module>mingrui-shop-service-xxx</module>
         <module>mingrui-shop-service-search</module>
+        <module>mingrui-shop-service-template</module>
+        <module>mingrui-shop-service-user</module>
     </modules>
     <dependencies>
         <!-- SpringBoot-整合Web组件 -->
@@ -23,6 +25,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <!-- springcloud feign组件 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -36,23 +39,33 @@
             <version>5.1.30</version>
             <scope>runtime</scope><!--项目运行阶段使用-->
         </dependency>
+
         <!--通用mapper-->
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-spring-boot-starter</artifactId>
             <version>2.1.5</version>
         </dependency>
+
         <!--分页工具-->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.2.10</version>
         </dependency>
+
         <dependency>
             <groupId>com.baidu</groupId>
             <artifactId>mingrui-shop-service-api-xxx</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+
 
     </dependencies>
 

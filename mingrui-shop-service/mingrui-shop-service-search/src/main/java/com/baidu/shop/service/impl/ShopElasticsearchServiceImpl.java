@@ -24,6 +24,8 @@ import com.baidu.shop.utils.JSONUtil;
 import com.google.common.math.DoubleMath;
 import io.swagger.models.auth.In;
 import org.apache.commons.lang.math.NumberUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -69,8 +71,35 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
 
 
     @Override
-    public GoodsResponse search(String search,Integer page) {
-        SearchHits<GoodsDoc> searchHits = elasticsearchRestTemplate.search(this.getNativeSearchQueryBuilder(search,page).build(), GoodsDoc.class);
+    public Result<JSONObject> saveData(Integer spuId) {
+        SpuDTO spuDTO = new SpuDTO();
+        spuDTO.setId(spuId);
+
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(spuDTO);
+        GoodsDoc goodsDoc = goodsDocs.get(0);
+
+        elasticsearchRestTemplate.save(goodsDoc);
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<JSONObject> delData(Integer spuId) {
+        GoodsDoc goodsDoc = new GoodsDoc();
+        goodsDoc.setId(spuId.longValue());
+        elasticsearchRestTemplate.delete(goodsDoc);
+
+        return this.setResultSuccess();
+    }
+
+
+
+
+    @Override
+    public GoodsResponse search(String search,Integer page,String filter) {
+
+         //  System.err.println(filter);
+        SearchHits<GoodsDoc> searchHits = elasticsearchRestTemplate.search(this.getNativeSearchQueryBuilder(search,page,filter).build(), GoodsDoc.class);
 
         List<GoodsDoc> goodsDocs  = HighlightUtil.getHighlightList(searchHits.getSearchHits());
 
@@ -102,6 +131,8 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
 
     }
 
+
+
     //获得规格参数信息
     private Map<String, List<String>> getSpecMap(Integer hotCid,String search){
         SpecParamDTO specParamDTO = new SpecParamDTO();
@@ -112,6 +143,7 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
         Map<String, List<String>> specMap = new HashMap<>();
 
         if(specParamInfo.isSuccess()){
+
             List<SpecParamEntity> specParamList  = specParamInfo.getData();
 
             NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
@@ -140,21 +172,37 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
                 specMap.put(specParam.getName(),valueList);
             });
         }
-
         return specMap;
-
     }
 
 
     //得到NativeSearchQueryBuilder
-    private NativeSearchQueryBuilder getNativeSearchQueryBuilder(String search,Integer page){
-
+    private NativeSearchQueryBuilder getNativeSearchQueryBuilder(String search,Integer page,String filter){
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
 
         // 多字段查询
         nativeSearchQueryBuilder.withQuery(
                 QueryBuilders.multiMatchQuery(search,"title","brandName","categoryName")
         );
+
+        // 过滤查询
+        if(!StringUtils.isEmpty(filter) && filter.length() > 2){
+
+            Map<String, String> filterMap = JSONUtil.toMapValueString(filter);
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+            filterMap.forEach((key, value) ->{
+                MatchQueryBuilder matchQueryBuilder = null;
+                if(key.equals("brandId") || key.equals("cid3")){
+                     matchQueryBuilder = QueryBuilders.matchQuery(key, value);
+                }else {
+                     matchQueryBuilder = QueryBuilders.matchQuery("specs." + key + ".keyword", value);
+                }
+                boolQueryBuilder.must(matchQueryBuilder);
+            });
+
+            nativeSearchQueryBuilder.withFilter(boolQueryBuilder);
+        }
 
         // 结果过滤  不需要的不返回
         nativeSearchQueryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{"id","title","skus"},null));
@@ -173,7 +221,7 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
     }
 
     //通过聚合得到分类List
-    private    Map<Integer, List<CategoryEntity>>  getCategoryListByBucket(Aggregations aggregations){
+    private   Map<Integer, List<CategoryEntity>>  getCategoryListByBucket(Aggregations aggregations){
         // 获取聚合信息
         Terms agg_category = aggregations.get("agg_category");
         List<? extends Terms.Bucket> categoryBuckets = agg_category.getBuckets();
@@ -195,13 +243,11 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
         List<CategoryEntity> categoryList = null;
         if (categoryResult.isSuccess()){
             categoryList = categoryResult.getData();
-
         }
         Map<Integer, List<CategoryEntity>> map = new HashMap<>();
 
         map.put(hotCid.get(0),categoryList);
         return map;
-
     }
 
 
@@ -241,14 +287,14 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
             indexOperations.create();
             indexOperations.createMapping();
         }
-        List<GoodsDoc> goodsDocs = this.esGoodsInfo();
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(new SpuDTO());
         elasticsearchRestTemplate.save(goodsDocs);
         return this.setResultSuccess();
     }
 
     //@Override
-    private List<GoodsDoc> esGoodsInfo() {
-        SpuDTO spuDTO = new SpuDTO();
+    private List<GoodsDoc> esGoodsInfo(SpuDTO spuDTO) {
+       // SpuDTO spuDTO = new SpuDTO();
         /*spuDTO.setPage(1);
         spuDTO.setRows(5);*/
         Result<List<SpuDTO>> spuInfo = goodsFeign.getSpuInfo(spuDTO);

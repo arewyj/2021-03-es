@@ -19,6 +19,6 @@ mingrui:
   upload:
     path:
       windows: D:\\images
-      linux: /hxs/images
+      linux: /wang/images
     img:
       host: http://81.70.218.5/

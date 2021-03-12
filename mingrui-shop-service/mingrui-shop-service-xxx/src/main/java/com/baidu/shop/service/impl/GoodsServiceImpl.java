@@ -2,6 +2,8 @@ package com.baidu.shop.service.impl;
 
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.component.MrRabbitMQ;
+import com.baidu.shop.constant.MqMessageConstant;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
 import com.baidu.shop.dto.SpuDetailDTO;
@@ -14,6 +16,7 @@ import com.baidu.shop.utils.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,9 +52,13 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Resource
     private StockMapper stockMapper;
 
+    @Autowired
+    private MrRabbitMQ mrRabbitMQ;
+
+
     //提取重复的 删除sku stock 代码
     private void deleteSkuAndStock (Integer spuId){
-        Example example = new Example(SpuEntity.class);
+        Example example = new Example(SkuEntity.class);
         example.createCriteria().andEqualTo("spuId",spuId);
         List<SkuEntity> skuEntities = skuMapper.selectByExample(example);
 
@@ -77,21 +84,38 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     }
 
 
-    @Transactional
+   // @Transactional
     @Override//删除
     public Result<JsonObject> deleteGoods(Integer spuId) {
-        spuMapper.deleteByPrimaryKey(spuId);
-        spuDetailMapper.deleteByPrimaryKey(spuId);
 
-        this.deleteSkuAndStock(spuId);
+        this.deleteGoodsTransactional(spuId);
+        mrRabbitMQ.send(spuId + "", MqMessageConstant.SPU_ROUT_KEY_DELETE);
 
         return setResultSuccess();
     }
 
+    @Transactional
+    public void deleteGoodsTransactional(Integer spuId){
+        spuMapper.deleteByPrimaryKey(spuId);
+        spuDetailMapper.deleteByPrimaryKey(spuId);
+
+        this.deleteSkuAndStock(spuId);
+    }
+
     //修改
     @Override
-    @Transactional
+    //@Transactional
     public Result<JsonObject> editGoods(SpuDTO spuDTO) {
+
+        this.editGoodsTransactional(spuDTO);
+
+       // mrRabbitMQ.send(spuEntity.getId() + "", MqMessageConstant.SPU_ROUT_KEY_UPDATE);
+
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    public void editGoodsTransactional(SpuDTO spuDTO){
         final Date date = new Date();
         SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
         spuEntity.setLastUpdateTime(date);
@@ -110,28 +134,25 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
         this.insertSkuAndStock(spuDTO,spuEntity.getId(),date);
 
-        return this.setResultSuccess();
-    }
-
-    @Override
-    public Result<SpuDetailEntity> getSpuDetailBySpu(Integer spuId) {
-        SpuDetailEntity spuDetailEntity = spuDetailMapper.selectByPrimaryKey(spuId);
-        return this.setResultSuccess(spuDetailEntity);
-    }
-
-    @Override
-    public Result<List<SkuDTO>> getSkuBySpuId(Integer spuId) {
-        List<SkuDTO> list = skuMapper.selectSkuAndStockBySpuId(spuId);
-
-        return this.setResultSuccess(list);
     }
 
 
     //新增!!!!!!!
     @Override
-    @Transactional
+   // @Transactional
     public Result<JsonObject> saveGoods(SpuDTO spuDTO) {
-        System.out.println(spuDTO);
+
+        Integer spuId = this.saveTransactional(spuDTO);
+
+        mrRabbitMQ.send(spuId + "", MqMessageConstant.SPU_ROUT_KEY_SAVE);
+
+        return this.setResultSuccess();
+    }
+
+
+    @Transactional
+    public Integer saveTransactional(SpuDTO spuDTO){
+      //  System.out.println(spuDTO);
         final Date date = new Date();
         //新增spu
         SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
@@ -149,27 +170,50 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
         //新增sku,sku可能时多条数据
         this.insertSkuAndStock(spuDTO,spuEntity.getId(),date);
-        return this.setResultSuccess();
+
+        return spuEntity.getId();
     }
+
+
+
+    @Override
+    public Result<SpuDetailEntity> getSpuDetailBySpu(Integer spuId) {
+        SpuDetailEntity spuDetailEntity = spuDetailMapper.selectByPrimaryKey(spuId);
+        return this.setResultSuccess(spuDetailEntity);
+    }
+
+    @Override
+    public Result<List<SkuDTO>> getSkuBySpuId(Integer spuId) {
+        List<SkuDTO> list = skuMapper.selectSkuAndStockBySpuId(spuId);
+
+        return this.setResultSuccess(list);
+    }
+
+
 
     @Override
     public Result<List<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
 
-        if (ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())){
+        if (ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows()))
             PageHelper.startPage(spuDTO.getPage(),spuDTO.getRows());
-        }
-        if(!StringUtils.isEmpty(spuDTO.getSort()) && !StringUtils.isEmpty(spuDTO.getOrder())){
+
+        if(!StringUtils.isEmpty(spuDTO.getSort()) && !StringUtils.isEmpty(spuDTO.getOrder()))
             PageHelper.orderBy(spuDTO.getOrderBy());
-        }
+
         Example example = new Example(SpuEntity.class);
         Example.Criteria criteria = example.createCriteria();
 
-        if (ObjectUtil.isNotNull(spuDTO.getSaleable()) && spuDTO.getSaleable() != 2){
+        if (ObjectUtil.isNotNull(spuDTO.getSaleable()) && spuDTO.getSaleable() != 2)
             criteria.andEqualTo("saleable",spuDTO.getSaleable());
-        }
-        if (!StringUtils.isEmpty(spuDTO.getTitle())){
+
+        if (!StringUtils.isEmpty(spuDTO.getTitle()))
             criteria.andEqualTo("title","%"+spuDTO.getTitle()+"%");
-        }
+
+        if (ObjectUtil.isNotNull(spuDTO.getId()))
+            criteria.andEqualTo("id",spuDTO.getId());
+
+
+
         List<SpuEntity> spuEntities = spuMapper.selectByExample(example);
 
         List<SpuDTO> spuDTOList = spuEntities.stream().map(spuEntity -> {

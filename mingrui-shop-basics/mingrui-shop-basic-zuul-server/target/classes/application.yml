@@ -6,18 +6,11 @@ spring:
     name: eureka-zuul
 
 zuul:
-  # 声明路由
+  prefix: /api
   routes:
-    # 路由名称
-    api-xxx:
-      # 声明将所有以/api-ribbon/的请求都转发到eureka-ribbon的服务中
-      path: /api-xxx/**
-      serviceId: xxx-server
-    # 搜索路由
-    api-search:
-      path: /api-search/**
-      serviceId: search-server
-
+    xxx-server: /manage/**
+    search-server: /search/**
+    user-server: /user-center/**
   # 启用重试
   retryable: true
   # 包含此路径的不进行路由
